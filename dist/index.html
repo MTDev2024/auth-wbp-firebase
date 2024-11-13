@@ -2,11 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>auth_wbp_firebase</title>
-    <script src="/dist/bundle.js"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css"  />
+    <script defer src="bundle.js" ></script>
+    <title>Firebase</title>
 </head>
 <body>
-    
+    <h1>Firebase</h1>
+    <nav>
+      <ul class="menu">
+        <li id="register">Register</li>
+        <li id="login">Login</li>
+        <li id="logout">Logout</li>
+        <li id="contact">Contact</li>
+      </ul>
+    </nav>
+    <section>
+      <form method="post" class="authform">
+        <label for="email">email</label>
+        <input type="email" name="email" />
+        <label for="password">password</label>
+        <input type="password" name="password" /><br/>
+        <button id="buttonform">Register</button>
+      </form>
+    </section> 
+    <section>
+        <form method="post" class="profilform">
+          <div id="formulaire">
+            <input type="hidden" name="id" />
+            <label for="name">Nom</label>
+            <input type="text" name="name" />
+            <label for="firstname">Prénom</label>
+            <input type="text" name="firstname" />
+            <label for="email">Email</label>
+            <input type="email" name="email" disabled />
+            <label for="phone">Téléphone</label>
+            <input type="text" name="phone" />
+            <button id="profilbutton">Enregistrer</button>
+          </div>
+          
+          <div id="profil_photo">
+            <img id="photo" src="images/user.png" alt="photo de profil" />
+            <input type="file" accept="image/*" id="photo_url" />
+          </div>
+        </form>
+    </section>
+    <section>
+        <form method="post" class="contactform">
+            <h2>Formulaire de contact</h2><br/>
+            <label for="name">Nom</label>
+            <input type="text" name="name" />
+            <label for="email">Email</label>
+            <input type="email" name="email" />
+            <label for="message">Message</label>
+            <textarea name="message"></textarea>
+            <button id="sendbutton">Envoyer</button>
+        </form>
+    </section>  
 </body>
 </html>
