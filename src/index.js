@@ -137,7 +137,7 @@ profilForm.addEventListener('submit', e => {
 const id = profilForm.id.value;
 const user = {
     nom: profilForm.name.value,
-    prenom: profilForm.firstame.value,
+    prenom: profilForm.firstname.value,
     telephone: profilForm.phone.value,
     email: profilForm.email.value,
     photo_url: img_photo.getAttribute('src')
@@ -149,7 +149,7 @@ if(profilButton.innerText == "Enregistrer") {
     profilButton.innerText == "Modifier";
 }else if(profilButton.innerText == "Modifier") {
     //si user existe déjà on affiche modifier
-    updateCurrentUser(id, user);
+    updateUser(id, user);
 };
 
 });
@@ -162,7 +162,7 @@ if(profilButton.innerText == "Enregistrer") {
 
 // Recherche USER via son EMAIL
 async function searchUserInDatabase (email, res) {
-    const q = query(collection(db, 'users"'), where('email', '==', email));
+    const q = query(collection(db, 'users'), where('email', '==', email));
     const users = await getDocs(q);
     users.forEach(user => {
         const data = user.data();
@@ -170,4 +170,19 @@ async function searchUserInDatabase (email, res) {
         res(data);
     });
 }
+
+// Enregistrer un utilisateur dans la base de données
+function saveUser(user){
+    addDoc(collection(db, 'users'), user)
+        .then(()=>alert("Bienvenue"))
+        .catch(error => alert(error.message));
+};
+
+// Modifier un utilisateur dans la base de données
+function updateUser(id, user){
+    updateDoc(doc(db, 'users', id), user)
+        .then(()=>alert("modifications enregistrées"))
+        .catch(error => alert(error.message));
+};
+
 
