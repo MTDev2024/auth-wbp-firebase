@@ -128,3 +128,46 @@ async function displayUserData(email){
         profilButton.innerText = "Modifier";
     });
 }
+
+//Click sur Enregistrer (Register) ou Modifier (Login)
+profilForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    //Récupérer les donnnées du formulaire
+const id = profilForm.id.value;
+const user = {
+    nom: profilForm.name.value,
+    prenom: profilForm.firstame.value,
+    telephone: profilForm.phone.value,
+    email: profilForm.email.value,
+    photo_url: img_photo.getAttribute('src')
+};
+
+if(profilButton.innerText == "Enregistrer") {
+    //si le bouton affiche "enregistrer" on crée un new user
+    saveUser(user);
+    profilButton.innerText == "Modifier";
+}else if(profilButton.innerText == "Modifier") {
+    //si user existe déjà on affiche modifier
+    updateCurrentUser(id, user);
+};
+
+});
+
+
+
+
+
+// DATABASE
+
+// Recherche USER via son EMAIL
+async function searchUserInDatabase (email, res) {
+    const q = query(collection(db, 'users"'), where('email', '==', email));
+    const users = await getDocs(q);
+    users.forEach(user => {
+        const data = user.data();
+        data.id = user.id;
+        res(data);
+    });
+}
+
