@@ -129,44 +129,71 @@ async function displayUserData(email){
     });
 }
 
-//Click sur Enregistrer (Register) ou Modifier (Login)
-profilForm.addEventListener('submit',async e => {
+// Quand on click sur le bouton Enregistrer ou Modifier
+profilForm.addEventListener('submit', async e =>{
     e.preventDefault();
-
-    //Récupérer les donnnées du formulaire
-const id = profilForm.id.value;
-const user = {
-    nom: profilForm.name.value,
-    prenom: profilForm.firstname.value,
-    telephone: profilForm.phone.value,
-    email: profilForm.email.value,
-    photo_url: img_photo.getAttribute('src')
-};
-if (photo){
-    user.photo_url = await uploadPhotoInStorage(photo);
-}
-photo = null
-
-if(profilButton.innerText == "Enregistrer") {
-    //si le bouton affiche "enregistrer" on crée un new user
-    saveUser(user);
-    profilButton.innerText == "Modifier";
-}else if(profilButton.innerText == "Modifier") {
-    //si user existe déjà on affiche "modifier"
-    updateUser(id, user);
-};
-
+    // réccupère les données du formulaire
+    const id = profilForm.id.value;
+    const user = { 
+        nom: profilForm.name.value,
+        prenom: profilForm.firstname.value,
+        telephone: profilForm.phone.value,
+        email: profilForm.email.value,
+        photo_url: img_photo.getAttribute('src')
+    };
+    if (photo){
+        user.photo_url = await uploadPhotoInStorage(photo);
+    }
+    photo = null
+    
+    if(profilButton.innerText == "Enregistrer"){
+        // Si Enregistrer alors on crée un nouveau utilisateur
+        saveUser(user) ;
+        profilButton.innerText = "Modifier";
+    }else if(profilButton.innerText == "Modifier"){
+        // Si utilisateur existant on modifie les données
+        updateUser(id, user);
+    };
 });
 
+// Click sur menu contact
+contactMenu.addEventListener('click', ()=>{
+    // Affiche ou cache le formulaire de contact
+    if(contactForm.style.display != "flex")
+        contactForm.style.display = "flex";
+    else
+        contactForm.style.display = "none";
+});
 
+// Quand on click sur le bouton Envoyer du formulaire de contact
+contactForm.addEventListener('submit', e =>{
+    e.preventDefault();
+    // récupère les données du formulaire
+   const data = {
+        name: contactForm.name.value,
+        email: contactForm.email.value,
+        message: contactForm.message.value,
+        subject: "message envoyé avec firebase sendMail"
+   };
+    // envoie les donnée à la function 
+    const url = "";
+    
+    fetch(url,{
+        method: 'POST',
+        headers: { 'Content-type' : 'application/json' },
+        body: JSON.stringify(data),
+    }).then(response => response.text())
+      .then(() => {
+        alert("Votre message à bien été envoyé");
+        contactForm.reset();
+    });
+});
 
+/* Database */
 
-
-// DATABASE
-
-// Recherche USER via son EMAIL
-async function searchUserInDatabase (email, res) {
-    const q = query(collection(db, 'users'), where('email', '==', email));
+// recherche un utilisateur dans la database d'après son l'email
+async function searchUserInDatabase(email, res){
+    const q = query(collection(db, 'users'), where('email', '==', email ));
     const users = await getDocs(q);
     users.forEach(user => {
         const data = user.data();
@@ -175,34 +202,36 @@ async function searchUserInDatabase (email, res) {
     });
 }
 
-// Enregistrer un utilisateur dans la base de données
+// enregistre un utilisateur dans la database
 function saveUser(user){
     addDoc(collection(db, 'users'), user)
-        .then(()=>alert("Bienvenue"))
+        .then(()=> alert("utilisateur enregistré"))
         .catch(error => alert(error.message));
 };
 
-// Modifier un utilisateur dans la base de données
+// Modifie un utilisateur dans la database
 function updateUser(id, user){
     updateDoc(doc(db, 'users', id), user)
-        .then(()=>alert("modifications enregistrées"))
+        .then(()=>alert('modifications enregistrées'))
         .catch(error => alert(error.message));
 };
 
-function uploadPhotoInStorage(file){
-    //Date.now pour obtenir un nom de fichier unique
-    const name = Date.now()  + '-' + file.name;
-    const storageRef = ref(storage, 'image/' + name);
-    const metadata = { contentType: 'image/jpeg'};
+/* Storage */
 
-    //upload l'image dans storage
+async function uploadPhotoInStorage(file){
+    // Date.now permet ici d'avoir un nom unique de fichier
+    const name = Date.now() + '-' + file.name;
+    const storageRef = ref(storage, 'images/' + name);
+    const metadata = { contentType: 'image/jpeg' };
+
+    // Upload l'image sur le storage 
     try{
         await uploadBytesResumable(storageRef, file, metadata);
-    }
+    } 
     catch(error){
         alert(error.message);
         return null;
     }
-    //Retourne le chemin d'accés de l'image pour l'enregistrer dans la base de données
+    // retourne le chemin d'accès de l'image pour l'enregistrer en bdd
     return await getDownloadURL(storageRef);
 };
