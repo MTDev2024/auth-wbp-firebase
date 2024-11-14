@@ -130,7 +130,7 @@ async function displayUserData(email){
 }
 
 //Click sur Enregistrer (Register) ou Modifier (Login)
-profilForm.addEventListener('submit', e => {
+profilForm.addEventListener('submit',async e => {
     e.preventDefault();
 
     //Récupérer les donnnées du formulaire
@@ -142,13 +142,17 @@ const user = {
     email: profilForm.email.value,
     photo_url: img_photo.getAttribute('src')
 };
+if (photo){
+    user.photo_url = await uploadPhotoInStorage(photo);
+}
+photo = null
 
 if(profilButton.innerText == "Enregistrer") {
     //si le bouton affiche "enregistrer" on crée un new user
     saveUser(user);
     profilButton.innerText == "Modifier";
 }else if(profilButton.innerText == "Modifier") {
-    //si user existe déjà on affiche modifier
+    //si user existe déjà on affiche "modifier"
     updateUser(id, user);
 };
 
@@ -185,4 +189,20 @@ function updateUser(id, user){
         .catch(error => alert(error.message));
 };
 
+function uploadPhotoInStorage(file){
+    //Date.now pour obtenir un nom de fichier unique
+    const name = Date.now()  + '-' + file.name;
+    const storageRef = ref(storage, 'image/' + name);
+    const metadata = { contentType: 'image/jpeg'};
 
+    //upload l'image dans storage
+    try{
+        await uploadBytesResumable(storageRef, file, metadata);
+    }
+    catch(error){
+        alert(error.message);
+        return null;
+    }
+    //Retourne le chemin d'accés de l'image pour l'enregistrer dans la base de données
+    return await getDownloadURL(storageRef);
+};
